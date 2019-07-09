@@ -1,6 +1,5 @@
 ---
 # defaults file for openebs
-hosts: all
 cluster_name: kubernetes
 context_name: adm-ctx
 tiller_server_host: node1

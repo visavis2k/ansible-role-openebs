@@ -1,7 +1,14 @@
 ---
 # install OpenEBS on K8s cluster
+- name: create cluster-admin user context
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create cluster-admin user context
+      shell: kubectl config set-context {{ context_name }} --user=cluster-admin --cluster={{ cluster_name }}
+
 - name: OpenEBS 설치
-  hosts: '{{ hosts }}'
+  hosts: '{{ tiller_server_host }}'
   become: yes
   roles:
     - role: openebs
