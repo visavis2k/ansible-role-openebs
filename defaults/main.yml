@@ -15,8 +15,8 @@ helm:
     source:
       type: repo
       location: https://kubernetes-charts.storage.googleapis.com
-  name: {{ release_name }}
-  namespace: {{ namespace_to_install }}
-  host: {{ tiller_server_host }}
-  port: {{ tiller_server_port }}
+  name: "{{ release_name }}"
+  namespace: "{{ namespace_to_install }}"
+  host: "{{ tiller_server_host }}"
+  port: "{{ tiller_server_port }}"
 
