@@ -1,12 +1,32 @@
 ---
 # tasks file for openebs
-- name: open-iscsi 설치
+- name: install open-iscsi
   apt:
     name: open-iscsi
     state: present
     update_cache: yes
 
-- name: open-iscsi 서비스 재실행
+- name: restart open-iscsi service
   service:
     name: open-iscsi
     state: restarted
+
+- name: create cluster-admin user context
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create cluster-admin user context
+      shell: kubectl config set-context {{ context_name }} --user=cluster-admin --cluster={{ cluster_name }}
+
+- name: install OpenEBS on Kubernetes cluster with Helm
+  helm:
+    chart:
+      name: {{ helm.chart.name }}
+      version: {{ helm.chart.version }}
+      source:
+        type: {{ helm.chart.source.type }}
+        location: {{ helm.chart.source.location }}
+    name: {{ helm.name }}
+    namespace: {{ helm.namespace }}
+    host: {{ helm.host }}
+    port: {{ helm.port }}

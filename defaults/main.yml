@@ -1,3 +1,22 @@
 ---
 # defaults file for openebs
-hosts: node1
+hosts: all
+cluster_name: kubernetes
+context_name: adm-ctx
+tiller_server_host: node1
+tiller_server_port: 44134
+release_name: openebs
+namespace_to_install: openebs
+
+helm:
+  chart:
+    name: openebs
+    version: 1.0.0
+    source:
+      type: repo
+      location: https://kubernetes-charts.storage.googleapis.com
+  name: {{ release_name }}
+  namespace: {{ namespace_to_install }}
+  host: {{ tiller_server_host }}
+  port: {{ tiller_server_port }}
+
