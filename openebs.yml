@@ -1,0 +1,7 @@
+---
+# install OpenEBS on K8s cluster
+- name: OpenEBS 설치
+  hosts: '{{ hosts }}'
+  become: yes
+  roles:
+    - role: openebs

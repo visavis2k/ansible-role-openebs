@@ -1,0 +1,12 @@
+---
+# tasks file for openebs
+- name: open-iscsi 설치
+  apt:
+    name: open-iscsi
+    state: present
+    update_cache: yes
+
+- name: open-iscsi 서비스 재실행
+  service:
+    name: open-iscsi
+    state: restarted
