@@ -18,4 +18,3 @@ helm:
   namespace: "{{ namespace_to_install }}"
   host: "{{ tiller_server_host }}"
   port: "{{ tiller_server_port }}"
-

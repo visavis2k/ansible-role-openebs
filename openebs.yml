@@ -2,13 +2,28 @@
 # install OpenEBS on K8s cluster
 - name: create cluster-admin user context
   hosts: localhost
-  gather_facts: false
+  gather_facts: no
   tasks:
     - name: Create cluster-admin user context
-      shell: kubectl config set-context {{ context_name }} --user=cluster-admin --cluster={{ cluster_name }}
+      shell: kubectl config set-context "{{ context_name | default('adm-ctx') }} --user=cluster-admin --cluster={{ cluster_name | default('kubernetes') }}
 
-- name: OpenEBS 설치
-  hosts: '{{ tiller_server_host }}'
+- name: install OpenEBS
+  hosts: '{{ openebs_hosts | default('all') }}'
   become: yes
   roles:
-    - role: openebs
+    - role: .
+
+- name: install OpenEBS on Kubernetes cluster with Helm
+  hosts: localhost
+  gather_facts: no
+  helm:
+    chart:
+      name: openebs
+      version: "{{ chart_version | default('1.0.0') }}"
+      source:
+        type: repo
+        location: https://kubernetes-charts.storage.googleapis.com
+    name: "{{ release_name | default('openebs') }}"
+    namespace: "{{ namespace | default('openebs') }}"
+    host: "{{ tiller_server_host | default('localhost') }}"
+    port: "{{ tiller_server_port | default('44134') }}"
