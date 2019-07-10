@@ -17,7 +17,7 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Set fact for tunnel pid file
+    - name: Set fact for pid file
       set_fact:
         tunnel_pid_file: /tmp/helm_pid
 
@@ -51,4 +51,3 @@
           args:
             removes: "{{ tunnel_pid_file }}"
           changed_when: false
-
