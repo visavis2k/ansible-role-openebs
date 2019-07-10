@@ -17,15 +17,38 @@
   hosts: localhost
   gather_facts: no
   tasks:
+    - name: Set fact for tunnel pid file
+      set_fact:
+        tunnel_pid_file: /tmp/helm_pid
+
     - name: Install OpenEBS with Helm
-      helm:
-        chart:
-          name: openebs
-          version: "{{ chart_version | default('1.0.0') }}"
-          source:
-            type: repo
-            location: https://kubernetes-charts.storage.googleapis.com
-        name: "{{ release_name | default('openebs') }}"
-        namespace: "{{ release_namespace | default('openebs') }}"
-        host: "{{ tiller_server_host | default('localhost') }}"
-        port: "{{ tiller_server_port | default('44134') }}"
+      block:
+        - name: set up a tunnel to tiller
+          shell: |
+            tiller_pod="$(kubectl get pod -l app=helm,name=tiller --namespace kube-system -o name|cut -d/ -f2)"
+            nohup kubectl port-forward "$tiller_pod" 44134:44134 --namespace kube-system </dev/null >/dev/null 2>&1 &
+            echo "$!" >{{ tunnel_pid_file|quote }}
+          args:
+            creates: "{{ tunnel_pid_file }}"
+          changed_when: false
+        - name: Install OpenEBS with Helm
+          helm:
+            chart:
+              name: openebs
+              version: "{{ chart_version | default('1.0.0') }}"
+              source:
+                type: repo
+                location: https://kubernetes-charts.storage.googleapis.com
+            name: "{{ release_name | default('openebs') }}"
+            namespace: "{{ release_namespace | default('openebs') }}"
+            host: "{{ tiller_server_host | default('localhost') }}"
+            port: "{{ tiller_server_port | default('44134') }}"
+      always:
+        - name: tear down the tunnel to tiller
+          shell: |
+            kill "$(cat {{ tunnel_pid_file|quote }})" || true
+            rm -f {{ tunnel_pid_file|quote }}
+          args:
+            removes: "{{ tunnel_pid_file }}"
+          changed_when: false
+
