@@ -11,7 +11,7 @@
   hosts: "{{ openebs_hosts | default('all') }}"
   become: yes
   roles:
-    - role: '{{playbook_dir}}'
+    - role: "{{ playbook_dir }}"
 
 - name: Install OpenEBS on Kubernetes cluster with Helm
   hosts: localhost
